@@ -1,8 +1,8 @@
 <div align="center">
 
-# mcp-github 🐙
+# mcp-github
 
-**A Model Context Protocol server that gives AI full read access to GitHub.**
+**A Model Context Protocol server that gives AI models full read access to GitHub.**
 
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.x-3178C6?style=flat-square&logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
 [![MCP](https://img.shields.io/badge/MCP-Compatible-8B5CF6?style=flat-square)](https://modelcontextprotocol.io/)
@@ -23,7 +23,7 @@ Search repos, read code, track issues, explore users — all from within any MCP
 > *"Show me all open bugs in vercel/next.js"*  
 > *"What has @sindresorhus starred recently?"*
 
-It works with **Claude**, **Cursor**, **Windsurf**, and any other MCP-compatible client.
+It works with **Claude.ai**, **Claude Desktop**, **Cursor**, **Windsurf**, and any other MCP-compatible client.
 
 ---
 
@@ -32,7 +32,7 @@ It works with **Claude**, **Cursor**, **Windsurf**, and any other MCP-compatible
 25 tools across 5 categories:
 
 <details>
-<summary><b>🔍 Search (4 tools)</b></summary>
+<summary><b>Search — 4 tools</b></summary>
 
 | Tool | Description |
 |------|-------------|
@@ -44,7 +44,7 @@ It works with **Claude**, **Cursor**, **Windsurf**, and any other MCP-compatible
 </details>
 
 <details>
-<summary><b>📦 Repositories (6 tools)</b></summary>
+<summary><b>Repositories — 6 tools</b></summary>
 
 | Tool | Description |
 |------|-------------|
@@ -58,7 +58,7 @@ It works with **Claude**, **Cursor**, **Windsurf**, and any other MCP-compatible
 </details>
 
 <details>
-<summary><b>⭐ Trending & Discovery (3 tools)</b></summary>
+<summary><b>Trending & Discovery — 3 tools</b></summary>
 
 | Tool | Description |
 |------|-------------|
@@ -69,7 +69,7 @@ It works with **Claude**, **Cursor**, **Windsurf**, and any other MCP-compatible
 </details>
 
 <details>
-<summary><b>🐛 Issues & Pull Requests (5 tools)</b></summary>
+<summary><b>Issues & Pull Requests — 5 tools</b></summary>
 
 | Tool | Description |
 |------|-------------|
@@ -82,7 +82,7 @@ It works with **Claude**, **Cursor**, **Windsurf**, and any other MCP-compatible
 </details>
 
 <details>
-<summary><b>👤 Users, Orgs & Releases (7 tools)</b></summary>
+<summary><b>Users, Orgs & Releases — 7 tools</b></summary>
 
 | Tool | Description |
 |------|-------------|
@@ -119,12 +119,57 @@ npm run build
 3. Select scopes: `public_repo`, `read:user`, `read:org`
 4. Copy the token
 
-### 3. Connect to your AI client
+---
+
+## Using with Claude.ai (web)
+
+Claude.ai connects to MCP servers over the internet, so you need to deploy this server publicly before connecting it. Here's the full flow:
+
+### Step 1 — Deploy to Railway (free)
+
+Railway is the easiest option — free tier, no credit card required, deploys in under 2 minutes.
+
+1. Push this repo to GitHub
+2. Go to [railway.app](https://railway.app) and create a new project
+3. Select **Deploy from GitHub repo** and pick your fork
+4. Go to **Variables** and add:
+   ```
+   GITHUB_TOKEN = ghp_your_token_here
+   ```
+5. Railway will build and deploy automatically. Copy the public URL it gives you (e.g. `https://mcp-github-production.up.railway.app`)
+
+> You can also deploy to [Render](https://render.com) or [Fly.io](https://fly.io) — both have free tiers and work the same way.
+
+### Step 2 — Connect on Claude.ai
+
+> Requires a **Pro, Max, Team, or Enterprise** plan.
+
+1. Open [claude.ai](https://claude.ai) and go to **Settings**
+2. Click **Connectors** in the sidebar
+3. Scroll down and click **Add custom connector**
+4. Paste your Railway URL and click **Add**
+5. Follow any authentication prompts
+
+### Step 3 — Enable in a conversation
+
+1. Start a new chat
+2. Click the **+** button in the bottom left
+3. Select **Connectors**
+4. Toggle on `mcp-github`
+
+Claude can now access all 25 GitHub tools in that conversation.
+
+---
+
+## Using with Claude Desktop
 
 <details>
-<summary><b>Claude Desktop</b></summary>
+<summary>Expand</summary>
 
-Edit `~/Library/Application Support/Claude/claude_desktop_config.json` (Mac) or `%APPDATA%\Claude\claude_desktop_config.json` (Windows):
+Edit your config file:
+
+- **Mac:** `~/Library/Application Support/Claude/claude_desktop_config.json`
+- **Windows:** `%APPDATA%\Claude\claude_desktop_config.json`
 
 ```json
 {
@@ -140,39 +185,39 @@ Edit `~/Library/Application Support/Claude/claude_desktop_config.json` (Mac) or 
 }
 ```
 
-Restart Claude Desktop.
+Restart Claude Desktop. The tools will appear in the tools menu.
 
 </details>
 
-<details>
-<summary><b>Cursor / Windsurf / Other MCP clients</b></summary>
+## Using with Cursor / Windsurf
 
-Point your client at `dist/index.js` with the `GITHUB_TOKEN` environment variable set. Refer to your client's MCP documentation for the exact config format.
+<details>
+<summary>Expand</summary>
+
+Point your client at `dist/index.js` with `GITHUB_TOKEN` set as an environment variable. Refer to your client's MCP documentation for the exact config format.
 
 </details>
 
 ---
 
-## Testing
+## Testing locally
 
-**Option 1 — MCP Inspector (recommended)**
-
-The easiest way to verify everything works without any AI client:
+**MCP Inspector — test any tool without an AI client**
 
 ```bash
 npx @modelcontextprotocol/inspector node dist/index.js
 ```
 
-Opens a browser UI at `localhost:5173`. Select any tool, fill in the inputs, hit Run, and see the live JSON response.
+Opens at `localhost:5173`. Pick a tool, fill in the inputs, hit Run, and see the raw JSON response.
 
-**Option 2 — Quick smoke test**
+**Smoke test**
 
 ```bash
 GITHUB_TOKEN=ghp_xxx node dist/index.js
-# Output: mcp-github server running on stdio
+# Expected output: mcp-github server running on stdio
 ```
 
-**Option 3 — Direct tool call**
+**Direct tool call**
 
 ```bash
 GITHUB_TOKEN=ghp_xxx node -e "
@@ -186,8 +231,6 @@ import('./dist/handlers.js').then(m =>
 
 ## Example prompts
 
-Once connected:
-
 ```
 What are the trending TypeScript repos today?
 Show me all open bugs in vercel/next.js
@@ -197,7 +240,7 @@ Find GitHub users in India with over 1000 followers
 Search for code using the Anthropic SDK in Python
 What repos has sindresorhus starred recently?
 Show me the latest releases of microsoft/vscode
-Get me the top issues from the next.js repo labelled 'good first issue'
+Get the top issues in next.js labelled 'good first issue'
 ```
 
 ---
